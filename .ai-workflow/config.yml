@@ -1,0 +1,32 @@
+agents:
+  claude:
+    command: claude
+    model: manual
+    payload_mode: stdin
+    args:
+      - "-p"
+    permission_args:
+      - "<verification-required>"
+    timeout_seconds: 300
+
+  codex:
+    command: codex
+    model: manual
+    payload_mode: stdin
+    args:
+      - "exec"
+    permission_args:
+      - "<verification-required>"
+    timeout_seconds: 300
+
+limits:
+  max_total_calls: 10
+  max_claude_calls: 5
+  max_codex_calls: 5
+  retry_count: 0
+
+workflow:
+  mode: semi_auto
+  require_manual_approval: true
+  default_next_agent: manual
+  output_capture: stdout
