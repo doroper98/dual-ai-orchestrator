@@ -1,0 +1,18 @@
+{
+  "name": "dual-ai-orchestrator",
+  "version": "0.1.0",
+  "description": "PoC CLI for a file-based Claude/Codex workflow orchestrator.",
+  "type": "module",
+  "bin": {
+    "dual-ai-poc": "./bin/dual-ai-poc.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/dual-ai-poc.js && node --check src/cli.js && node --check src/init.js && node --check src/prerequisites.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
