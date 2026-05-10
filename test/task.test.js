@@ -98,6 +98,46 @@ test('runTask classifies Codex usage limit failures', async () => {
   assert.match(status, /wait for the CLI usage limit reset/);
 });
 
+test('runTask stops before invoking an agent when call limits are reached', async () => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'dual-ai-run-task-call-limit-'));
+  const workflowRoot = path.join(cwd, '.ai-workflow');
+  const taskPath = path.join(workflowRoot, 'inbox', 'codex', 'poc-task-call-limit.md');
+  await mkdir(path.dirname(taskPath), { recursive: true });
+  await writeFile(path.join(workflowRoot, 'config.yml'), `limits:
+  max_total_calls: 1
+  max_claude_calls: 1
+  max_codex_calls: 1
+`);
+  await writeFile(path.join(workflowRoot, 'events.jsonl'), `${JSON.stringify({
+    type: 'agent_started',
+    agent: 'codex',
+    task_id: 'previous-task',
+  })}\n`);
+  await writeFile(taskPath, TASK_MARKDOWN.replace('poc-task-001', 'poc-task-call-limit'));
+
+  let calls = 0;
+  const result = await runTask(taskPath, {
+    cwd,
+    commandResolver: async () => 'codex',
+    runner: async () => {
+      calls += 1;
+      return {
+        exitCode: 0,
+        timedOut: false,
+        stdout: 'should not run\n',
+        stderr: '',
+      };
+    },
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.failureReason, 'call_limit');
+  assert.equal(calls, 0);
+
+  const output = await readFile(result.outputPath, 'utf8');
+  assert.match(output, /Failure Reason: call_limit/);
+});
+
 test('processInboxTask moves completed inbox tasks to archive', async () => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'dual-ai-process-task-'));
   const taskPath = path.join(cwd, '.ai-workflow', 'inbox', 'codex', 'poc-task-001.md');

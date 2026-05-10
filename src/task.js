@@ -1,5 +1,6 @@
 import { appendFile, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { checkCallLimit } from './config.js';
 import { runAgentPrompt } from './verify.js';
 
 const VALID_AGENTS = new Set(['claude', 'codex']);
@@ -15,6 +16,53 @@ export async function runTask(taskPath, {
   const task = parseTaskMarkdown(taskMarkdown, absoluteTaskPath, cwd);
 
   const startedAt = new Date().toISOString();
+  const callLimit = await checkCallLimit(task.agent, { cwd });
+  if (!callLimit.ok) {
+    const finishedAt = new Date().toISOString();
+    const result = {
+      command: null,
+      args: [],
+      exitCode: null,
+      timedOut: false,
+      stdout: '',
+      stderr: callLimit.message,
+    };
+
+    await mkdir(path.dirname(task.outputPath), { recursive: true });
+    await writeFile(task.outputPath, formatTaskResult({
+      task,
+      startedAt,
+      finishedAt,
+      ok: false,
+      failureReason: callLimit.reason,
+      ...result,
+    }));
+    await appendEvent(cwd, {
+      type: 'agent_failed',
+      task_id: task.taskId,
+      agent: task.agent,
+      exit_code: null,
+      failure_reason: callLimit.reason,
+      output_path: path.relative(cwd, task.outputPath),
+    });
+    await updateSharedState(cwd, {
+      task,
+      ok: false,
+      failureReason: callLimit.reason,
+      outputPath: task.outputPath,
+      finishedAt,
+    });
+
+    return {
+      ok: false,
+      agent: task.agent,
+      taskId: task.taskId,
+      outputPath: task.outputPath,
+      failureReason: callLimit.reason,
+      ...result,
+    };
+  }
+
   await appendEvent(cwd, {
     type: 'agent_started',
     task_id: task.taskId,
@@ -279,6 +327,9 @@ function nextActionForTaskResult(ok, failureReason) {
   }
   if (failureReason === 'timeout') {
     return 'inspect the timed out task and retry manually if appropriate';
+  }
+  if (failureReason === 'call_limit') {
+    return 'increase call limits in .ai-workflow/config.yml or wait before running more tasks';
   }
   return 'inspect failed task output and decide whether to retry';
 }

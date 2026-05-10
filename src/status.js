@@ -164,6 +164,9 @@ function inferNextAction({ queues, verification, lastEvent }) {
   if (lastEvent?.failure_reason === 'usage_limit') {
     return 'wait for the CLI usage limit reset, then retry the last task';
   }
+  if (lastEvent?.failure_reason === 'call_limit') {
+    return 'increase call limits in .ai-workflow/config.yml or pause before running more tasks';
+  }
   if (queues.inbox.claude > 0 || queues.inbox.codex > 0) {
     return 'run dual-ai-poc watch or run-task for pending inbox files';
   }
