@@ -22,7 +22,7 @@ test('initWorkflow creates the PoC workflow structure and templates', async () =
   assert.match(config, /retry_count: 0/);
 
   const contextLedger = await readFile(path.join(cwd, '.ai-workflow', 'shared', 'context-ledger.md'), 'utf8');
-  assert.match(contextLedger, /Claude\/Codex invocation is intentionally not implemented yet/);
+  assert.match(contextLedger, /verify one Claude\/Codex invocation at a time/);
 });
 
 test('initWorkflow leaves existing files unchanged', async () => {
@@ -33,4 +33,6 @@ test('initWorkflow leaves existing files unchanged', async () => {
 
   const status = await readFile(path.join(cwd, '.ai-workflow', 'shared', 'status.md'), 'utf8');
   assert.match(status, /Next action: run dual-ai-poc prerequisites/);
+  assert.match(status, /dual-ai-poc verify claude/);
+  assert.match(status, /dual-ai-poc verify codex/);
 });

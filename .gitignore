@@ -1,3 +1,8 @@
 node_modules/
 npm-debug.log*
 .DS_Store
+.ai-workflow/inbox/**/*.md
+.ai-workflow/processing/**/*.md
+.ai-workflow/outbox/**/*.md
+.ai-workflow/archive/**/*.md
+.ai-workflow/failed/**/*.md

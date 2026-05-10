@@ -66,7 +66,7 @@ Run \`dual-ai-poc prerequisites\` to populate this section.
 
 ## Claude CLI
 
-- Non-interactive execution: not implemented in initial PoC
+- Non-interactive execution: run \`dual-ai-poc verify claude\`
 - Payload mode: pending
 - Stdout capture: pending
 - Exit code: pending
@@ -75,7 +75,7 @@ Run \`dual-ai-poc prerequisites\` to populate this section.
 
 ## Codex CLI
 
-- Non-interactive execution: not implemented in initial PoC
+- Non-interactive execution: run \`dual-ai-poc verify codex\`
 - Payload mode: pending
 - Stdout capture: pending
 - Exit code: pending
@@ -94,7 +94,7 @@ const CONTEXT_LEDGER_TEMPLATE = `# Context Ledger
 
 ## Narrative
 
-Initial PoC repository structure has been created. Claude/Codex invocation is intentionally not implemented yet.
+Initial PoC repository structure has been created. Run prerequisites first, then verify one Claude/Codex invocation at a time.
 
 ## Manual Handoff
 
@@ -111,9 +111,9 @@ const STATUS_TEMPLATE = `# PoC Status
 
 - Phase: initialized
 - Mode: semi_auto
-- Claude invocation: not implemented
-- Codex invocation: not implemented
-- Next action: run dual-ai-poc prerequisites
+- Claude invocation: run dual-ai-poc verify claude
+- Codex invocation: run dual-ai-poc verify codex
+- Next action: run dual-ai-poc prerequisites, then run dual-ai-poc verify claude and dual-ai-poc verify codex
 `;
 
 async function writeFileIfMissing(filePath, content, createdFiles) {

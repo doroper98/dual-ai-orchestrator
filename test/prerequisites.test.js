@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { checkPrerequisites, formatPrerequisitesMarkdown } from '../src/prerequisites.js';
 
-test('formatPrerequisitesMarkdown documents pending AI invocation checks', () => {
+test('formatPrerequisitesMarkdown documents AI invocation verification commands', () => {
   const markdown = formatPrerequisitesMarkdown({
     generatedAt: '2026-05-09T00:00:00.000Z',
     platform: 'TestOS',
@@ -24,7 +24,8 @@ test('formatPrerequisitesMarkdown documents pending AI invocation checks', () =>
   });
 
   assert.match(markdown, /\| Node\.js \| yes \| pass \| node \| v20\.0\.0 \| ok \|/);
-  assert.match(markdown, /Non-interactive execution: not implemented in initial PoC/);
+  assert.match(markdown, /Non-interactive execution: run `dual-ai-poc verify claude`/);
+  assert.match(markdown, /Non-interactive execution: run `dual-ai-poc verify codex`/);
   assert.match(markdown, /Login status: manual verification required/);
 });
 
