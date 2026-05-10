@@ -1,3 +1,4 @@
+import { formatCostReport, getCostReport } from './cost-report.js';
 import { initWorkflow } from './init.js';
 import { checkPrerequisites } from './prerequisites.js';
 import { formatResumeContext, getResumeContext } from './resume.js';
@@ -17,6 +18,7 @@ Usage:
   dual-ai-poc watch
   dual-ai-poc status
   dual-ai-poc resume-context
+  dual-ai-poc cost-report
   dual-ai-poc help
 
 Initial PoC scope:
@@ -27,6 +29,7 @@ Initial PoC scope:
   - Watch inbox folders and run new Markdown task files.
   - Print the current workflow status.
   - Print resume context and manual handoff text.
+  - Print CLI call usage against configured limits.
 `;
 
 export async function runCli(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
@@ -94,6 +97,11 @@ export async function runCli(args, { cwd = process.cwd(), stdout = process.stdou
     case 'resume-context': {
       const context = await getResumeContext({ cwd });
       stdout.write(formatResumeContext(context));
+      return 0;
+    }
+    case 'cost-report': {
+      const report = await getCostReport({ cwd });
+      stdout.write(formatCostReport(report));
       return 0;
     }
     case 'help':
